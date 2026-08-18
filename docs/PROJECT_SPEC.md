@@ -250,20 +250,24 @@ datadir         = /var/lib/mysql
 ```
 1. データディレクトリ未初期化か判定
      [ ! -d /var/lib/mysql/mysql ]  ← システム DB の有無で判定する
-2. 未初期化の場合のみ:
+2. 起動ごとに `/run/mysqld` を作成（`/run` は named volume ではないため）
+3. 未初期化の場合のみ:
    a. 初期化 SQL を /tmp に生成
         CREATE DATABASE IF NOT EXISTS `${MYSQL_DATABASE}`;
         CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '<db_password の中身>';
         GRANT ALL PRIVILEGES ON `${MYSQL_DATABASE}`.* TO '${MYSQL_USER}'@'%';
         FLUSH PRIVILEGES;
    b. mariadb-install-db --user=mysql --datadir=/var/lib/mysql \
-        --skip-test-db --extra-file=/tmp/init.sql
-   c. /tmp/init.sql を削除
-3. exec /usr/bin/mariadbd --user=mysql
+        --auth-root-authentication-method=socket --skip-test-db
+   c. 一時的に socket 専用の mariadbd を起動し、readiness を待つ
+   d. mariadb client で /tmp/init.sql を実行し、mariadb-admin shutdown で停止
+   e. /tmp/init.sql を削除
+4. exec /usr/bin/mariadbd --user=mysql
 ```
 
 **設計上のポイント**
-- `mariadb-install-db` の `--extra-file` は「通常の初期化の直後に指定 SQL を実行する」オプション（MariaDB 公式ドキュメント記載）。これを使うと **「一時起動 → SQL 流し込み → 停止 → 本起動」という手順が丸ごと不要** になる。`mariadbd --bootstrap` を自前で扱う実装よりはるかに短く、事故も少ない。
+- `mariadb-install-db` は system tables の bootstrap 中に grant tables を無効化して実行するため、`--extra-file` に `CREATE USER` / `GRANT` を渡す方法は Alpine 3.23 の MariaDB 11.4 では使えないことを実機で確認した。そこで、system tables 作成後に socket 専用の一時サーバを起動して SQL を実行する。
+- 一時サーバの readiness 待機は有限回数の `for` ループであり、コンテナを生かすための無限ループではない。本番の最後は `exec` で MariaDB が PID 1 になる。
 - `--skip-test-db` で不要な `test` データベースを作らない。
 - パスワードは `$(cat /run/secrets/db_password)` として **実行時に読む**。Dockerfile にも `.env` にも出てこない。
 - 初期化 SQL は `/tmp` に置き、使用後に削除する（volume 上に残さない）。

@@ -93,28 +93,31 @@ git status                                              # .env と *.txt が unt
 ## Phase 3 — MariaDB コンテナ
 
 ### 3.1 Dockerfile
-- [ ] `FROM alpine:3.23`
-- [ ] `apk add --no-cache mariadb mariadb-client`（1つの RUN にまとめる）
-- [ ] `conf/zz-inception.cnf` を `/etc/my.cnf.d/` に COPY
-- [ ] `tools/entrypoint.sh` を配置し実行権限を付与
-- [ ] `ENTRYPOINT ["...entrypoint.sh"]` を **exec 形式** で書く
+- [x] `FROM alpine:3.23`
+- [x] `apk add --no-cache mariadb mariadb-client`（1つの RUN にまとめる）
+- [x] `conf/zz-inception.cnf` を `/etc/my.cnf.d/` に COPY
+- [x] `tools/entrypoint.sh` を配置し実行権限を付与
+- [x] `ENTRYPOINT ["...entrypoint.sh"]` を **exec 形式** で書く
 
 ### 3.2 設定ファイル `conf/zz-inception.cnf`
-- [ ] `[mysqld]` セクションに `skip-networking = 0` / `bind-address = 0.0.0.0` / `skip-name-resolve` / `datadir = /var/lib/mysql`
-- [ ] **なぜファイル名が `zz-` で始まるか説明できるようにする**（`/etc/my.cnf.d/` の読み込み順、SPEC §5.1）
+- [x] `[mysqld]` セクションに `skip-networking = 0` / `bind-address = 0.0.0.0` / `skip-name-resolve` / `datadir = /var/lib/mysql`
+- [x] **なぜファイル名が `zz-` で始まるか説明できるようにする**（`/etc/my.cnf.d/` の読み込み順、SPEC §5.1）
 
 ### 3.3 entrypoint.sh
-- [ ] `[ ! -d /var/lib/mysql/mysql ]` で未初期化を判定
-- [ ] 未初期化時のみ、初期化 SQL を `/tmp` に生成
+- [x] `[ ! -d /var/lib/mysql/mysql ]` で未初期化を判定
+- [x] 起動ごとに `/run/mysqld` を作成（`/run` は永続 volume ではないため）
+- [x] 未初期化時のみ、初期化 SQL を `/tmp` に生成
   - DB 作成 / ユーザー作成（`'%'` から接続可）/ GRANT / FLUSH
   - パスワードは `$(cat /run/secrets/db_password)` から取得
-- [ ] `mariadb-install-db --user=mysql --datadir=/var/lib/mysql --skip-test-db --extra-file=/tmp/init.sql`
-- [ ] 初期化 SQL を削除
-- [ ] 最終行 `exec /usr/bin/mariadbd --user=mysql`
+- [x] `mariadb-install-db --user=mysql --datadir=/var/lib/mysql --auth-root-authentication-method=socket --skip-test-db`
+- [x] 一時 socket 専用の `mariadbd` を起動し、有限回数の readiness 待機後に `mariadb` で初期化 SQL を実行
+- [x] `mariadb-admin shutdown` で一時サーバを停止し、PID を `wait` してから本体を起動
+- [x] 初期化 SQL を削除
+- [x] 最終行 `exec /usr/bin/mariadbd --user=mysql`
 
 ### 3.4 単体確認
-- [ ] `docker build -t mariadb-test srcs/requirements/mariadb`
-- [ ] 一時的なテスト用 secret ファイルを作り、`docker run` で起動して確認
+- [x] `docker build -t mariadb-test srcs/requirements/mariadb`
+- [x] ローカル secret を read-only mount した一時コンテナで起動して確認
 
 ▶ 検証:
 ```
@@ -125,7 +128,7 @@ docker exec -it <c> mariadb-admin ping -u root --protocol=socket # 成功（heal
 docker logs <c>                                     # 起動ログが stdout/stderr に出ている
 docker stop <c>                                     # 10秒待たずに即座に止まる（= SIGTERM が届いている）
 ```
-- [ ] **コンテナを消して再度 `docker run`（同じ volume）** → 初期化がスキップされ、DB が残っていることを確認（冪等性）
+- [x] **コンテナを消して再度 `docker run`（同じ volume）** → 初期化がスキップされ、DB が残っていることを確認（冪等性）
 
 ---
 

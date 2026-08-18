@@ -1,1 +1,9 @@
-# MariaDB configuration will be added in Phase 3.
+# This file is loaded after the package default because its name sorts later.
+# The default Alpine configuration enables skip-networking; this service must
+# accept connections from the WordPress container on the user-defined network.
+
+[mysqld]
+skip-networking = 0
+bind-address = 0.0.0.0
+skip-name-resolve
+datadir = /var/lib/mysql
