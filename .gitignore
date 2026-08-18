@@ -1,0 +1,13 @@
+# Local configuration and credentials
+srcs/.env
+secrets/*.txt
+!secrets/*.txt.example
+
+# Runtime data and local tooling
+data/
+*.log
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
