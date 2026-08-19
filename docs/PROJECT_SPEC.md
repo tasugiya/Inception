@@ -347,7 +347,7 @@ datadir         = /var/lib/mysql
 | 1 | `FROM alpine:3.23` |
 | 2 | `ARG DOMAIN_NAME` （compose の `build.args` から受け取る） |
 | 3 | `RUN apk add --no-cache nginx openssl` |
-| 4 | 自己署名証明書を生成: `openssl req -x509 -nodes -newkey rsa:2048 -days 365 -subj "/CN=${DOMAIN_NAME}" -keyout /etc/nginx/ssl/inception.key -out /etc/nginx/ssl/inception.crt` |
+| 4 | 自己署名証明書を生成: `openssl req -x509 -nodes -newkey rsa:2048 -sha256 -days 365 -subj "/CN=${DOMAIN_NAME}" -addext "subjectAltName=DNS:${DOMAIN_NAME}" -keyout /etc/nginx/ssl/inception.key -out /etc/nginx/ssl/inception.crt` |
 | 5 | `COPY conf/default.conf /etc/nginx/http.d/default.conf`（既定ファイルを置き換え） |
 | 6 | `sed` で conf 内のドメインプレースホルダを `${DOMAIN_NAME}` に置換 |
 | 7 | `CMD ["nginx", "-g", "daemon off;"]` |

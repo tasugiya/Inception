@@ -170,21 +170,21 @@ docker exec -it <c> netstat -ltn                          # 0.0.0.0:9000 で待�
 ## Phase 5 — NGINX コンテナ
 
 ### 5.1 Dockerfile
-- [ ] `FROM alpine:3.23`
-- [ ] `ARG DOMAIN_NAME`
-- [ ] `apk add --no-cache nginx openssl`
-- [ ] `openssl req -x509 -nodes -newkey rsa:2048 -days 365 -subj "/CN=${DOMAIN_NAME}" ...` で自己署名証明書を生成
-- [ ] `conf/default.conf` を `/etc/nginx/http.d/default.conf` に COPY（既定を置き換える）
-- [ ] `sed` で conf 内のドメインを `${DOMAIN_NAME}` に置換
-- [ ] `CMD ["nginx", "-g", "daemon off;"]`
+- [x] `FROM alpine:3.23`
+- [x] `ARG DOMAIN_NAME`
+- [x] `apk add --no-cache nginx openssl`
+- [x] `openssl req -x509 -nodes -newkey rsa:2048 -days 365 -subj "/CN=${DOMAIN_NAME}" ...` で自己署名証明書を生成（SAN も付与）
+- [x] `conf/default.conf` を `/etc/nginx/http.d/default.conf` に COPY（既定を置き換える）
+- [x] `sed` で conf 内のドメインを `${DOMAIN_NAME}` に置換
+- [x] `CMD ["nginx", "-g", "daemon off;"]`
 
 ### 5.2 `conf/default.conf`
-- [ ] `listen 443 ssl;`（**80 は書かない**）
-- [ ] `server_name` / `ssl_certificate` / `ssl_certificate_key`
-- [ ] `ssl_protocols TLSv1.2 TLSv1.3;` ← 要件の中核
-- [ ] `root /var/www/html;` / `index index.php;`
-- [ ] `location / { try_files $uri $uri/ /index.php?$args; }`
-- [ ] `location ~ \.php$ { fastcgi_pass wordpress:9000; include fastcgi.conf; }`
+- [x] `listen 443 ssl;`（**80 は書かない**）
+- [x] `server_name` / `ssl_certificate` / `ssl_certificate_key`
+- [x] `ssl_protocols TLSv1.2 TLSv1.3;` ← 要件の中核
+- [x] `root /var/www/html;` / `index index.php;`
+- [x] `location / { try_files $uri $uri/ /index.php?$args; }`
+- [x] `location ~ \.php$ { fastcgi_pass wordpress:9000; include fastcgi.conf; }`
 
 ▶ 検証:
 ```

@@ -46,6 +46,17 @@ Alpine 3.23 の MariaDB 11.4.12 で `--extra-file` にユーザー作成 SQL を
 - [PHP: FastCGI Process Manager](https://www.php.net/manual/en/install.fpm.php)
   - php-fpm を nginx から FastCGI で利用する構成の根拠。
 
+## 2026-08-20 — Phase 5 NGINX / TLS
+
+- [NGINX: Configuring HTTPS servers](https://nginx.org/en/docs/http/configuring_https_servers.html)
+  - `listen 443 ssl`、証明書、`ssl_protocols TLSv1.2 TLSv1.3` の構成を確認した。
+- [NGINX: ngx_http_ssl_module](https://nginx.org/en/docs/http/ngx_http_ssl_module.html)
+  - TLS 設定ディレクティブの公式リファレンス。
+- [NGINX: ngx_http_fastcgi_module](https://nginx.org/en/docs/http/ngx_http_fastcgi_module.html)
+  - `fastcgi_pass wordpress:9000` と `SCRIPT_FILENAME` を含む FastCGI パラメータの根拠。
+- [Dockerfile reference](https://docs.docker.com/reference/dockerfile/)
+  - `ARG DOMAIN_NAME` と exec form の `CMD` を使用する根拠。
+
 ## 参照予定
 
 実装時に Docker Compose、named volume、secrets、user-defined network、PID 1、WordPress、WP-CLI、Alpine パッケージの公式資料を追加する。課題文にない判断は、公式資料で確認できたものだけ採用する。
