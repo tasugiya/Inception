@@ -57,6 +57,19 @@ Alpine 3.23 の MariaDB 11.4.12 で `--extra-file` にユーザー作成 SQL を
 - [Dockerfile reference](https://docs.docker.com/reference/dockerfile/)
   - `ARG DOMAIN_NAME` と exec form の `CMD` を使用する根拠。
 
+## 2026-08-20 — Phase 6 Docker Compose / Makefile
+
+- [Compose file reference: services](https://docs.docker.com/reference/compose-file/services/)
+  - 3サービスの `build`、`restart`、`healthcheck`、`depends_on` を定義する際の公式リファレンス。
+- [Compose file reference: volumes](https://docs.docker.com/reference/compose-file/volumes/)
+  - `local` driver と `driver_opts` の bind mount で、named volume を `${DATA_PATH}/mariadb` と `${DATA_PATH}/wordpress` に対応させる根拠。
+- [Compose file reference: secrets](https://docs.docker.com/reference/compose-file/secrets/)
+  - ホスト上の1ファイル1シークレットをトップレベルで宣言し、必要なサービスだけに付与する構成の根拠。
+- [Compose: control startup order](https://docs.docker.com/compose/how-tos/startup-order/)
+  - WordPress が MariaDB の `service_healthy` を待つ `depends_on` 条件の根拠。
+- [Docker Compose down reference](https://docs.docker.com/reference/cli/docker/compose/down/)
+  - 通常の `down` では named volume を残し、`clean` / `fclean` の削除範囲を分ける判断の根拠。
+
 ## 参照予定
 
-実装時に Docker Compose、named volume、secrets、user-defined network、PID 1、WordPress、WP-CLI、Alpine パッケージの公式資料を追加する。課題文にない判断は、公式資料で確認できたものだけ採用する。
+残りのPhaseでも、課題文にない判断は公式資料で確認できたものだけ採用する。

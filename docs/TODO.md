@@ -204,25 +204,25 @@ curl -I http://<login>.42.fr                        # 接続拒否
 ## Phase 6 — docker-compose.yml と Makefile による統合
 
 ### 6.1 docker-compose.yml
-- [ ] `services` に3つ。各サービスに `build` / `image: <name>:1.0` / `container_name` / `networks` / `restart: unless-stopped`
-- [ ] トップレベル `networks: inception (bridge)`
-- [ ] トップレベル `volumes`（`local` + `driver_opts` で `${DATA_PATH}/...`）
-- [ ] トップレベル `secrets`（`file: ../secrets/*.txt`）
-- [ ] `environment` はサービスごとに必要な変数だけ列挙（`env_file` で一括投入しない）
-- [ ] nginx にのみ `ports: ["443:443"]`
-- [ ] nginx の volume マウントは `:ro`
-- [ ] mariadb に `healthcheck`
-- [ ] wordpress に `depends_on: {mariadb: {condition: service_healthy}}`
-- [ ] nginx に `depends_on: [wordpress]`
-- [ ] `version:` キーは書かない
+- [x] `services` に3つ。各サービスに `build` / `image: <name>:1.0` / `container_name` / `networks` / `restart: unless-stopped`
+- [x] トップレベル `networks: inception (bridge)`
+- [x] トップレベル `volumes`（`local` + `driver_opts` で `${DATA_PATH}/...`）
+- [x] トップレベル `secrets`（`file: ../secrets/*.txt`）
+- [x] `environment` はサービスごとに必要な変数だけ列挙（`env_file` で一括投入しない）
+- [x] nginx にのみ `ports: ["443:443"]`
+- [x] nginx の volume マウントは `:ro`
+- [x] mariadb に `healthcheck`
+- [x] wordpress に `depends_on: {mariadb: {condition: service_healthy}}`
+- [x] nginx に `depends_on: [wordpress]`
+- [x] `version:` キーは書かない
 
 ### 6.2 Makefile
-- [ ] `COMPOSE := docker compose --env-file srcs/.env -f srcs/docker-compose.yml`
-- [ ] `DATA_PATH` を `.env` から読む（直書きしない）
-- [ ] ターゲット: `all` / `check` / `dirs` / `up` / `down` / `re` / `clean` / `fclean` / `logs` / `ps`
-- [ ] `check`: `.env` と `secrets/*.txt` の存在＋`CHANGE_ME` が残っていないかを確認し、無ければ手順を表示して失敗
-- [ ] `dirs`: `mkdir -p $(DATA_PATH)/mariadb $(DATA_PATH)/wordpress`
-- [ ] `.PHONY` を全ターゲットに設定
+- [x] `COMPOSE := docker compose --env-file srcs/.env -f srcs/docker-compose.yml`
+- [x] `DATA_PATH` を `.env` から読む（直書きしない）
+- [x] ターゲット: `all` / `check` / `dirs` / `up` / `down` / `re` / `clean` / `fclean` / `logs` / `ps`
+- [x] `check`: `.env` と `secrets/*.txt` の存在＋`CHANGE_ME` が残っていないかを確認し、無ければ手順を表示して失敗
+- [x] `dirs`: `mkdir -p $(DATA_PATH)/mariadb $(DATA_PATH)/wordpress`
+- [x] `.PHONY` を全ターゲットに設定
 
 ▶ 検証:
 ```
@@ -230,6 +230,8 @@ make            # 3コンテナが Up になる
 docker ps       # 3つとも Up、公開ポートは nginx の 443 のみ
 ```
 ブラウザで `https://<login>.42.fr` → WordPress のサイトが表示される（インストールウィザードが出たら Phase 4.3 の `wp core install` が動いていない）
+
+実機検証（WSL2）: `make up`、`docker compose config --quiet`、`docker compose ps`、`docker volume inspect`、`curl -kI --resolve tasugiya.42.fr:443:127.0.0.1 https://tasugiya.42.fr/` が成功した。
 
 ---
 
