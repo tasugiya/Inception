@@ -31,6 +31,21 @@
 
 Alpine 3.23 の MariaDB 11.4.12 で `--extra-file` にユーザー作成 SQL を渡すと、bootstrap 中の `--skip-grant-tables` により `CREATE USER` が失敗した。そのため、system tables の作成とアプリケーション用 SQL の実行を分け、一時 socket サーバ経由で後者を実行する設計に変更した。
 
+## 2026-08-19 — Phase 4 WordPress / PHP-FPM
+
+- [WordPress: Before You Install](https://developer.wordpress.org/advanced-administration/before-install/)
+  - PHP、MariaDB、HTTPS が必要という実行要件を確認した。
+- [WordPress: How to install WordPress](https://developer.wordpress.org/advanced-administration/before-install/howto-install/)
+  - DB ユーザー、`wp-config.php`、WordPress インストールの責務を確認した。
+- [WP-CLI: Installing](https://make.wordpress.org/cli/handbook/guides/installing/)
+  - WP-CLI は公式推奨の PHAR を PATH 上に配置する方式を採用した。
+- [WP-CLI: Verifying downloads](https://make.wordpress.org/cli/handbook/guides/verifying-downloads/)
+  - PHAR の検証方法を確認した。現段階では公式の stable PHAR URL を使用し、イメージ build 時に `wp --info` を実行する。
+- [Alpine package index: PHP84 mysqli](https://pkgs.alpinelinux.org/contents?arch=x86_64&branch=v3.23&name=php84-mysqli&repo=community)
+  - Alpine 3.23 の PHP84 拡張パッケージ名と配置を確認した。
+- [PHP: FastCGI Process Manager](https://www.php.net/manual/en/install.fpm.php)
+  - php-fpm を nginx から FastCGI で利用する構成の根拠。
+
 ## 参照予定
 
 実装時に Docker Compose、named volume、secrets、user-defined network、PID 1、WordPress、WP-CLI、Alpine パッケージの公式資料を追加する。課題文にない判断は、公式資料で確認できたものだけ採用する。

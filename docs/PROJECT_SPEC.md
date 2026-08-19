@@ -297,11 +297,13 @@ datadir         = /var/lib/mysql
 - volume はコンテナ起動時に `/var/www/html` を覆うため、ビルド時にそこへ展開したファイルは初回起動で見えなくなる。→ ビルド時は **volume 外の `/usr/src/wordpress`** に置き、起動時にコピーする（公式 wordpress イメージと同じ考え方）。
 - 実行時にネットワークが不要になり、再ビルドなしの再起動が速い。「イメージは自己完結している」と説明できる。
 
+**PHP memory_limit**: 現在の WordPress コアを WP-CLI で展開するには Alpine PHP の既定 `128M` では不足したため、`/etc/php84/conf.d/99-wordpress.ini` で `memory_limit=256M` を明示する。これはビルド時の `wp core download` と runtime の WP-CLI の共通設定である。
+
 **www.conf の必須変更点**
 
 | 項目 | 既定 | 変更後 | 理由 |
 |---|---|---|---|
-| `listen` | `127.0.0.1:9000` | `9000` | 別コンテナの nginx から到達できるようにする |
+| `listen` | `127.0.0.1:9000` | `0.0.0.0:9000` | 別コンテナの nginx から IPv4 で到達できるようにする |
 | `user` / `group` | `nobody` | `nobody`（据え置き） | ファイル所有者を合わせる（entrypoint で `chown`） |
 | プロセス管理 | `pm = dynamic` | 据え置き | 変更する理由がない |
 

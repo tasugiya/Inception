@@ -135,26 +135,26 @@ docker stop <c>                                     # 10秒待たずに即座に
 ## Phase 4 — WordPress + php-fpm コンテナ
 
 ### 4.1 Dockerfile
-- [ ] `FROM alpine:3.23`
-- [ ] `php84-fpm` + 拡張群 + `curl` を `apk add --no-cache`
-- [ ] WP-CLI の PHAR を取得 → `/usr/local/bin/wp` に実行権限付きで配置
-- [ ] `wp core download --path=/usr/src/wordpress --allow-root` で **ビルド時に** WordPress 本体を取得
+- [x] `FROM alpine:3.23`
+- [x] `php84-fpm` + 拡張群 + `curl` を `apk add --no-cache`
+- [x] WP-CLI の PHAR を取得 → `/usr/local/bin/wp` に実行権限付きで配置
+- [x] `wp core download --path=/usr/src/wordpress --allow-root` で **ビルド時に** WordPress 本体を取得
       （`/var/www/html` に置かないこと。volume に覆われて消える）
-- [ ] `conf/www.conf` を `/etc/php84/php-fpm.d/www.conf` に COPY
-- [ ] entrypoint を配置、`ENTRYPOINT` は exec 形式
+- [x] `conf/www.conf` を `/etc/php84/php-fpm.d/www.conf` に COPY
+- [x] entrypoint を配置、`ENTRYPOINT` は exec 形式
 
 ### 4.2 `conf/www.conf`
-- [ ] `listen = 9000`（`127.0.0.1:9000` から変更する。**ここを忘れると後で 502 になる**）
-- [ ] `user` / `group` は `nobody` のまま
+- [x] `listen = 0.0.0.0:9000`（`127.0.0.1:9000` から変更する。**ここを忘れると後で 502 になる**）
+- [x] `user` / `group` は `nobody` のまま
 
 ### 4.3 entrypoint.sh
-- [ ] `/var/www/html` が空なら `/usr/src/wordpress` からコピー
-- [ ] `wp core is-installed --allow-root` が失敗する場合のみ以下を実行
-  - [ ] `wp config create`（`--dbhost=mariadb:3306`、パスワードは secrets から）
-  - [ ] `wp core install`（`--url=https://$DOMAIN_NAME`、`--skip-email`）
-  - [ ] `wp user create`（2人目、`--role=author`）
-- [ ] `chown -R nobody:nobody /var/www/html`
-- [ ] 最終行 `exec /usr/sbin/php-fpm84 -F`
+- [x] `/var/www/html` が空なら `/usr/src/wordpress` からコピー
+- [x] `wp core is-installed --allow-root` が失敗する場合のみ以下を実行
+  - [x] `wp config create`（`--dbhost=mariadb:3306`、パスワードは secrets から）
+  - [x] `wp core install`（`--url=https://$DOMAIN_NAME`、`--skip-email`）
+  - [x] `wp user create`（2人目、`--role=author`）
+- [x] `chown -R nobody:nobody /var/www/html`
+- [x] 最終行 `exec /usr/sbin/php-fpm84 -F`
 
 ▶ 検証（この時点では compose で mariadb と一緒に起動して確認するのが早い）:
 ```
@@ -163,7 +163,7 @@ docker exec -it <c> ls /var/www/html                      # wp-config.php と wp
 docker exec -it <c> wp user list --allow-root             # 2名、1名が administrator
 docker exec -it <c> netstat -ltn                          # 0.0.0.0:9000 で待受（127.0.0.1 ではない）
 ```
-- [ ] コンテナを消して再起動 → 再インストールが走らないことを確認（冪等性）
+- [x] コンテナを消して再起動 → 再インストールが走らないことを確認（冪等性）
 
 ---
 
