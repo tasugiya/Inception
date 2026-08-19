@@ -11,14 +11,6 @@ die()
 : "${MYSQL_DATABASE:?MYSQL_DATABASE is required}"
 : "${MYSQL_USER:?MYSQL_USER is required}"
 
-case "$MYSQL_DATABASE" in
-	*[!A-Za-z0-9_]*|'') die "MYSQL_DATABASE must contain only letters, digits, and underscores" ;;
-esac
-
-case "$MYSQL_USER" in
-	*[!A-Za-z0-9_]*|'') die "MYSQL_USER must contain only letters, digits, and underscores" ;;
-esac
-
 DATA_DIR=/var/lib/mysql
 INIT_SQL=/tmp/mariadb-init.sql
 INIT_SOCKET=/run/mysqld/mariadb-init.sock
