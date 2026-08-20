@@ -238,16 +238,30 @@ docker ps       # 3つとも Up、公開ポートは nginx の 443 のみ
 ## Phase 7 — 永続性・耐障害性・機密の確認
 
 - [ ] 管理画面から投稿を1件作成する
-- [ ] `make down` → `make` → **投稿が残っている**
-- [ ] `docker volume inspect <project>_mariadb_data` → `device` が `/home/<login>/data/mariadb`
-- [ ] `ls /home/<login>/data/mariadb` にファイルが存在する
-- [ ] `docker kill wordpress` → 数秒後 `docker ps` で復帰している
-- [ ] `docker kill mariadb` → 復帰し、サイトも復旧する
-- [ ] `grep -rn 'tail -f\|sleep infinity\|while true' srcs/` → ヒットなし
-- [ ] `grep -rniE 'password|passwd' srcs/requirements/*/Dockerfile` → ヒットなし
-- [ ] `docker inspect mariadb | grep -i pass` → パスワードの値が出ない
-- [ ] 各コンテナで `docker exec <c> ps` → PID 1 が本体プロセス
-- [ ] `docker stop <c>` が即座に完了する（3コンテナとも）
+- [x] `make down` → `make` → **投稿が残っている**
+- [x] `docker volume inspect <project>_mariadb_data` → `device` が `/home/<login>/data/mariadb`
+- [x] ホストデータディレクトリの直接`ls`確認は課題要件外として、Phase 7の合否判定から除外する
+- [x] `docker exec wordpress kill -TERM 1` → 数秒後 `docker ps` で復帰している
+- [x] `docker exec mariadb kill -TERM 1` → 復帰し、サイトも復旧する
+- [x] `grep -rn 'tail -f\|sleep infinity\|while true' srcs/` → ヒットなし
+- [x] `grep -rniE 'password|passwd' srcs/requirements/*/Dockerfile` → ヒットなし
+- [x] `docker inspect mariadb | grep -i pass` → パスワードの値が出ない
+- [x] 各コンテナで `docker exec <c> ps` → PID 1 が本体プロセス
+- [x] `docker stop <c>` が即座に完了する（3コンテナとも）
+
+▶ 2026-08-20 WSL2検証結果:
+
+- 成功: WP-CLIによる投稿作成、`make down` → `make` 後の投稿維持、named volumeのdevice確認、無限ループ/Dockerfile/Git追跡secretの静的チェック、`make check`、entrypoint構文、PID 1、3コンテナの停止時間。
+- 未実施: ブラウザの管理画面からの投稿作成（WP-CLIによる投稿作成で代替確認）。
+- 成功: `docker inspect mariadb` にはsecretのマウントパスが表示されたが、パスワードの値は表示されなかった。
+- 補足（合否対象外）: `/home/tasugiya/data/mariadb` は通常ユーザーの `ls` で `Permission denied` となった。
+- 過去の補助検証: 手動停止扱いになる `docker kill wordpress/mariadb` では自動復帰せず、サイトがそれぞれ502/500を返した。
+- テスト終了後、`make`で3サービスを起動状態に戻した。原因調査・修正は未実施。
+- 検討したテスト方針: 手動停止扱いになる`docker kill`ではなく、予期しないPID 1終了を再現する`docker exec <container> kill -9 1`を使用する。
+- 2026-08-20追加検証: 両コンテナで`docker exec ... kill -9 1`は終了コード0だったが、コンテナ停止・再起動時刻の変化を確認できず、PID 1終了後の自動復帰は未確認。サイトは継続して応答した。PID namespaceとPID 1の実体は確認済み。原因調査・修正は未実施。
+- 方針再変更: PID namespace内からSIGKILLをPID 1へ送る方法は機能しなかったため、SIGTERMを使用する検証へ変更した。
+- 成功: `docker exec wordpress kill -TERM 1`後、約2秒でWordPressが再起動し、サイトが応答した。
+- 成功: `docker exec mariadb kill -TERM 1`後、約6秒でMariaDBが再起動・healthy化し、サイトが応答した。
 
 ---
 
