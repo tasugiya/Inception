@@ -267,18 +267,20 @@ docker ps       # 3つとも Up、公開ポートは nginx の 443 のみ
 
 ## Phase 8 — ドキュメント作成
 
-- [ ] **README.md**（英語）
-  - [ ] 1行目: `*This project has been created as part of the 42 curriculum by <login>.*`（斜体）
-  - [ ] `Description`
-  - [ ] `Instructions`
-  - [ ] `Project description`: Docker の使い方 / 同梱ソース / 主要な設計判断
-  - [ ] 4つの比較: VM vs Docker / Secrets vs Env / Docker Network vs Host Network / Volumes vs Bind Mounts
-  - [ ] `Resources`: 公式ドキュメントのリンク **＋ AI をどのタスクに使ったかの明記**（v5.3 の新要件。忘れやすい）
-- [ ] **USER_DOC.md**（SPEC §9 の5項目）
-- [ ] **DEV_DOC.md**（SPEC §9 の6項目）
-- [ ] 3ファイルとも **リポジトリルート** に置く
+- [x] **README.md**（英語）
+  - [x] 1行目: `*This project has been created as part of the 42 curriculum by <login>.*`（斜体）
+  - [x] `Description`
+  - [x] `Instructions`
+  - [x] `Project description`: Docker の使い方 / 同梱ソース / 主要な設計判断
+  - [x] 4つの比較: VM vs Docker / Secrets vs Env / Docker Network vs Host Network / Volumes vs Bind Mounts
+  - [x] `Resources`: 公式ドキュメントのリンク **＋ AI をどのタスクに使ったかの明記**（v5.3 の新要件。忘れやすい）
+- [x] **USER_DOC.md**（SPEC §9 の5項目）
+- [x] **DEV_DOC.md**（SPEC §9 の6項目）
+- [x] 3ファイルとも **リポジトリルート** に置く
 
 ▶ 検証: `ls README.md USER_DOC.md DEV_DOC.md` が3つとも通る。README を GitHub で表示して1行目が斜体になっている。
+
+2026-08-20検証済み: 3ファイルの存在、READMEの1行目、必須見出し・比較項目、USER_DOCの5項目、DEV_DOCの6項目、`git diff --check`を確認した。コミットは未実施。
 
 ---
 
